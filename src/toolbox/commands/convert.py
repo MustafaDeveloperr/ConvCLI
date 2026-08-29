@@ -297,26 +297,13 @@ def convert_cmd(value: float, from_unit: str, to_unit: str, show_list: bool) -> 
 
     print_result(
         f"{value:g} {from_unit}",
-        f"[bold]{formatted} {to_unit}[/bold]  [dim]({category})[/dim]",
+        f"{formatted} {to_unit}  ({category})",
     )
 
 
 def _print_unit_list() -> None:
-    from rich.console import Console
-    from rich.table import Table
-
-    console = Console()
-    table = Table(title="Supported Units", show_header=True, header_style="bold cyan")
-    table.add_column("Category", style="yellow")
-    table.add_column("Units", style="green")
-
+    click.echo("Supported Units:")
     for category, tbl in _TABLES.items():
-        table.add_row(category, "  ".join(sorted(tbl.keys())))
-
-    table.add_row(
-        "temperature",
-        "c (Celsius)  f (Fahrenheit)  k (Kelvin)",
-    )
-
-    console.print(table)
-    console.print("\n[dim]Currency conversion requires a live API and is not supported.[/dim]")
+        click.echo(f"  {category:<12} {" ".join(sorted(tbl.keys()))}")
+    click.echo("  temperature  c (Celsius)  f (Fahrenheit)  k (Kelvin)")
+    click.echo("\nCurrency conversion requires a live API and is not supported.")

@@ -5,16 +5,16 @@ Uses pathlib/stat — no external dependencies.
 
 from __future__ import annotations
 
+import datetime
 import stat
 import sys
 from pathlib import Path
 
 import click
-from rich.table import Table
 
 from toolbox.cli import cli
 from toolbox.utils.files import directory_size, human_size
-from toolbox.utils.output import console, print_error
+from toolbox.utils.output import print_error
 
 
 @cli.group(name="file")
@@ -66,25 +66,20 @@ def file_info(path: str) -> None:
         kind = "Special file"
         size_bytes = st.st_size
 
-    import datetime
-
     modified = datetime.datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
     perms = stat.filemode(st.st_mode)
 
-    table = Table(show_header=False, box=None, padding=(0, 1))
-    table.add_column("Key", style="bold cyan", no_wrap=True)
-    table.add_column("Value")
-
-    table.add_row("Name", p.name)
-    table.add_row("Path", str(p.resolve()))
-    table.add_row("Type", kind)
-    table.add_row("Size", f"{human_size(size_bytes)}  ({size_bytes:,} bytes)")
-    table.add_row("Modified", modified)
-    table.add_row("Permissions", perms)
-
-    console.print()
-    console.print(table)
-    console.print()
+    lines = [
+        "",
+        f"  Name        : {p.name}",
+        f"  Path        : {p.resolve()}",
+        f"  Type        : {kind}",
+        f"  Size        : {human_size(size_bytes)} ({size_bytes:,} bytes)",
+        f"  Modified    : {modified}",
+        f"  Permissions : {perms}",
+        "",
+    ]
+    click.echo("\n".join(lines))
 
 
 @file_group.command(name="size")
@@ -113,6 +108,6 @@ def file_size(path: str, human: bool) -> None:
             sys.exit(1)
 
     if human:
-        console.print(f"{human_size(total)}  [dim]({total:,} bytes)[/dim]")
+        click.echo(f"{human_size(total)} ({total:,} bytes)")
     else:
-        console.print(str(total))
+        click.echo(str(total))

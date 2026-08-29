@@ -8,15 +8,9 @@ from __future__ import annotations
 import sys
 
 import click
-from rich.console import Console
-from rich.table import Table
-from rich.text import Text
 
 from toolbox import __version__
 from toolbox.errors import AppError
-
-err_console = Console(stderr=True)
-
 
 # ---------------------------------------------------------------------------
 # Context settings applied to every command
@@ -43,9 +37,9 @@ class ToolboxGroup(click.Group):
         try:
             return super().invoke(ctx)
         except AppError as exc:
-            err_console.print(f"\n[bold red]✗[/bold red] {exc.message}")
+            click.echo(f"\n✗ {exc.message}", err=True)
             if exc.hint:
-                err_console.print(f"\n{exc.hint}")
+                click.echo(f"\n{exc.hint}", err=True)
             sys.exit(1)
 
 
@@ -54,7 +48,7 @@ class ToolboxGroup(click.Group):
     context_settings=CONTEXT_SETTINGS,
     invoke_without_command=True,
 )
-@click.version_option(__version__, "--version", "-V", prog_name="tool")
+@click.version_option(__version__, "--version", "-V", prog_name="conv")
 @click.option(
     "--verbose",
     "-v",
@@ -65,10 +59,10 @@ class ToolboxGroup(click.Group):
 )
 @click.pass_context
 def cli(ctx: click.Context, verbose: bool) -> None:
-    """TOOLBOX — a single command for daily Linux utility tasks.
+    """CONV — a single command for daily Linux utility tasks.
 
     Run \b
-        tool COMMAND --help
+        conv COMMAND --help
 
     for help on a specific command.
     """
@@ -97,9 +91,9 @@ def help_cmd(ctx: click.Context, command: str | None) -> None:
         # Delegate to the target command's --help.
         target = cli.get_command(ctx, command)
         if target is None:
-            err_console.print(f"[bold red]✗[/bold red] Unknown command: {command}")
+            click.echo(f"✗ Unknown command: {command}", err=True)
             sys.exit(1)
-        with click.Context(target, info_name=f"tool {command}") as sub_ctx:
+        with click.Context(target, info_name=f"conv {command}") as sub_ctx:
             click.echo(target.get_help(sub_ctx))
 
 
@@ -167,42 +161,22 @@ _CATEGORIES: list[tuple[str, list[str]]] = [
 
 
 def _print_categorised_help() -> None:
-    console = Console()
-
-    console.print()
-    console.print(
-        Text("  TOOLBOX", style="bold cyan")
-        + Text(f"  v{__version__}", style="dim"),
-    )
-    console.print(
-        Text("  A single command for daily Linux utility tasks.", style="dim"),
-    )
-    console.print()
-
-    table = Table(
-        show_header=False,
-        box=None,
-        padding=(0, 2),
-        expand=False,
-    )
-    table.add_column("Category", style="bold yellow", no_wrap=True)
-    table.add_column("Commands", style="cyan")
+    lines = []
+    lines.append("")
+    lines.append(f"  CONV  v{__version__}")
+    lines.append("  A single command for daily Linux utility tasks.")
+    lines.append("")
 
     for category, commands in _CATEGORIES:
-        table.add_row(category, "  ".join(commands))
+        lines.append(f"  {category:<15} {" ".join(commands)}")
 
-    console.print(table)
-    console.print()
-    console.print(
-        "  [dim]Usage:[/dim]  [bold]tool[/bold] [bold cyan]COMMAND[/bold cyan] [dim][ARGS]...[/dim]"
-    )
-    console.print(
-        "  [dim]       tool COMMAND --help  for command-specific help[/dim]"
-    )
-    console.print(
-        "  [dim]       tool --version       show version and exit[/dim]"
-    )
-    console.print()
+    lines.append("")
+    lines.append("  Usage:  conv COMMAND [ARGS]...")
+    lines.append("          conv COMMAND --help  for command-specific help")
+    lines.append("          conv --version       show version and exit")
+    lines.append("")
+
+    click.echo("\n".join(lines))
 
 
 # ---------------------------------------------------------------------------
@@ -211,8 +185,6 @@ def _print_categorised_help() -> None:
 
 
 def _register_commands() -> None:
-    # Phase 2+: commands will be registered here as they are implemented.
-    # For now we import each module which calls cli.add_command() at import time.
     from toolbox.commands import convert   # noqa: F401
     from toolbox.commands import encoding  # noqa: F401
     from toolbox.commands import crypto    # noqa: F401

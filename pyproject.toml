@@ -12,7 +12,6 @@ license = { text = "MIT" }
 keywords = ["cli", "toolbox", "utility", "converter", "media"]
 dependencies = [
     "click>=8.1",
-    "rich>=13.0",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +23,7 @@ dev = [
 ]
 
 [project.scripts]
+conv = "toolbox.cli:cli"
 tool = "toolbox.cli:cli"
 
 [tool.hatch.build.targets.wheel]

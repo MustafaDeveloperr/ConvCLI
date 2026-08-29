@@ -10,7 +10,7 @@ from toolbox.cli import cli
 def test_cli_help(runner: CliRunner) -> None:
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-    assert "TOOLBOX" in result.output
+    assert "CONV" in result.output
     assert "Media" in result.output
     assert "Convert" in result.output
 
@@ -18,7 +18,7 @@ def test_cli_help(runner: CliRunner) -> None:
 def test_cli_help_alias(runner: CliRunner) -> None:
     result = runner.invoke(cli, ["help"])
     assert result.exit_code == 0
-    assert "TOOLBOX" in result.output
+    assert "CONV" in result.output
 
 
 def test_cli_help_specific_command(runner: CliRunner) -> None:

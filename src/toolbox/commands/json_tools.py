@@ -11,7 +11,7 @@ import sys
 import click
 
 from toolbox.cli import cli
-from toolbox.utils.output import console, err_console, print_error
+from toolbox.utils.output import print_error
 
 
 # ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ def json_pretty(file: click.File, indent: int) -> None:  # type: ignore[type-arg
         print_error("Invalid JSON.", reason=str(exc))
         sys.exit(1)
 
-    console.print_json(json.dumps(parsed, indent=indent, ensure_ascii=False))
+    click.echo(json.dumps(parsed, indent=indent, ensure_ascii=False))
 
 
 @json_group.command(name="minify")
@@ -76,7 +76,7 @@ def json_minify(file: click.File) -> None:  # type: ignore[type-arg]
         print_error("Invalid JSON.", reason=str(exc))
         sys.exit(1)
 
-    console.print(json.dumps(parsed, separators=(",", ":"), ensure_ascii=False))
+    click.echo(json.dumps(parsed, separators=(",", ":"), ensure_ascii=False))
 
 
 @json_group.command(name="validate")
@@ -97,7 +97,7 @@ def json_validate(file: click.File) -> None:  # type: ignore[type-arg]
     try:
         parsed = json.loads(raw)
     except json.JSONDecodeError as exc:
-        err_console.print(f"[bold red]✗[/bold red] Invalid JSON\n\n[dim]{exc}[/dim]")
+        click.echo(f"✗ Invalid JSON\n\n{exc}", err=True)
         sys.exit(1)
 
     # Summarise the top-level structure
@@ -108,4 +108,4 @@ def json_validate(file: click.File) -> None:  # type: ignore[type-arg]
     else:
         summary = type(parsed).__name__
 
-    console.print(f"[bold green]✓[/bold green] Valid JSON — {summary}")
+    click.echo(f"✓ Valid JSON — {summary}")
