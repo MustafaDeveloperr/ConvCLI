@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "toolbox-cli"
+version = "0.1.0"
+description = "A single 'tool' command for daily Linux utility tasks"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["cli", "toolbox", "utility", "converter", "media"]
+dependencies = [
+    "click>=8.1",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+images = ["Pillow>=10.0"]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov",
+    "Pillow>=10.0",
+]
+
+[project.scripts]
+tool = "toolbox.cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/toolbox"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
