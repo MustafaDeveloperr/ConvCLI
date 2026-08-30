@@ -102,4 +102,4 @@ PYTHONPATH=src pytest
 
 ## 📜 Lisans
 MIT License
-# FileCoverter
+# ConvCLI
